@@ -8,6 +8,15 @@ This repo guides a developer on running a local instance of backstage
 * GitHub Authentication App ID and Secret
 * Azure App Registration ID and secret
 
+# Create a Backstage folder
+The backstage folder will have a sample backstage app, but if you want the latest version, you can follow these steps:
+* From within the project folder, run the following ```npx @backstage/create-app@latest```
+* Ok to proceed? (y) -> press Enter
+* Just press enter when prompted for a name
+* Copy the app-config.yaml, app-config.local.yaml and app-config.production.yaml files in this repo
+* Copy the docker file from the backstage folder in this repo
+* Copy the catalog folder from this repo
+
 # Run backstage
 Install the GitHub plugin from the backstage folder:
 ```
@@ -39,17 +48,31 @@ Check that the logs have "database system is ready to accept connections" with t
 docker logs -f <CONTAINER ID>
 ```
 
-## Create a backstage docker file
-The backstage folder will have a sample backstage app, but if you want the latest version, you can follow these steps:
-* From within the project folder, run the following ```npx @backstage/create-app@latest```
-* Ok to proceed? (y) -> press Enter
-* Just press enter when prompted for a name
-* Copy the app-config.yaml, app-config.local.yaml and app-config.production.yaml files in this repo
-* Copy the docker file from the backstage folder in this repo
-* Copy the catalog folder from this repo
+## Add backend default
+```
+yarn workspace backend add @backstage/backend-defaults
+```
+
+## Create bundle for backstage
+```
+yarn build:backend --config ../../app-config.yaml --config ../../app-config.production.yaml
+```
 
 ## Build the docker image
+Add the Dockerfile to the backstage folder.
+```
+TODO
+```
+
+Build the docker image
+```
 docker build -t backstage_production .
+```
+
+## Run Backstage on Docker
+```
+docker run --name backstage -d -e GITHUB_TOKEN=token -e AUTH_GITHUB_CLIENT_ID=clientid -e AUTH_GITHUB_CLIENT_SECRET=secret -p 3000:3000 -p 7007:7007 backstage_production
+```
 
 # Run backstage on Kubernetes
 ## Setup Local Kubernetes Cluster
