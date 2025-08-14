@@ -86,8 +86,6 @@ catalog:
         - allow: [Group]
 ```
 
-Add a .env to the backstage folder and add the secrets.
-
 Modify the file in packages/backend/src/index.ts with the following line and remove the guest provider.
 ```
 backend.add(import('@backstage/plugin-auth-backend-module-github-provider'));
