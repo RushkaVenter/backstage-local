@@ -1,5 +1,7 @@
 app:
-  # Should be the same as backend.baseUrl when using the `app-backend` plugin.
+  listen:
+    host: 0.0.0.0
+    port: 7007
   baseUrl: http://localhost:7007
 
 backend:
@@ -17,10 +19,10 @@ backend:
   database:
     client: pg
     connection:
-      host: ${POSTGRES_HOST}
-      port: ${POSTGRES_PORT}
-      user: ${POSTGRES_USER}
-      password: ${POSTGRES_PASSWORD}
+      host: ${POSTGRES_HOST} # psql
+      port: ${POSTGRES_PORT} # 5432
+      user: ${POSTGRES_USER} # backstage
+      password: ${POSTGRES_PASSWORD} # backstage
       # https://node-postgres.com/features/ssl
       # you can set the sslmode configuration option via the `PGSSLMODE` environment variable
       # see https://www.postgresql.org/docs/current/libpq-ssl.html Table 33.1. SSL Mode Descriptions (e.g. require)
@@ -29,27 +31,39 @@ backend:
       #     $file: <file-path>/ca/server.crt
 
 auth:
+  environment: development
   providers:
-    guest: {}
+    github:
+      development:
+        clientId: ${AUTH_GITHUB_CLIENT_ID}
+        clientSecret: ${AUTH_GITHUB_CLIENT_SECRET}
+        ## uncomment if using GitHub Enterprise
+        # enterpriseInstanceUrl: ${AUTH_GITHUB_ENTERPRISE_INSTANCE_URL}
+        ## uncomment to set lifespan of user session
+        # sessionDuration: { hours: 24 } # supports `ms` library format (e.g. '24h', '2 days'), ISO duration, "human duration" as used in code
+        signIn:
+          resolvers:
+            # See https://backstage.io/docs/auth/github/provider#resolvers for more resolvers
+            - resolver: usernameMatchingUserEntityName
 
 catalog:
-  # Overrides the default list locations from app-config.yaml as these contain example data.
-  # See https://backstage.io/docs/features/software-catalog/#adding-components-to-the-catalog for more details
-  # on how to get entities into the catalog.
+  rules:
+    - allow: [Component, System, API, Resource, Location]
   locations:
-    # Local example data, replace this with your production config, these are intended for demo use only.
-    # File locations are relative to the backend process, typically in a deployed context, such as in a Docker container, this will be the root
+    # Local example data, file locations are relative to the backend process, typically `packages/backend`
     - type: file
-      target: ./examples/entities.yaml
-
-    # Local example template
-    - type: file
-      target: ./examples/template/template.yaml
+      target: /app/entities/users.yaml
       rules:
-        - allow: [Template]
+        - allow: [User]
 
-    # Local example organizational data
     - type: file
-      target: ./examples/org.yaml
+      target: /app/catalog/entities/groups.yaml
       rules:
-        - allow: [User, Group]
+        - allow: [Group]
+
+techdocs:
+  builder: 'local'
+  publisher:
+    type: 'local'
+  generator:
+    runIn: local
