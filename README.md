@@ -8,10 +8,113 @@ This repo guides a developer on running a local instance of backstage
 * GitHub Authentication App ID and Secret
 * Azure App Registration ID and secret
 
+# Useful links
+* https://github.com/ricardoandre97/backstage
+
 # Run backstage
+If you are not using the folder in the repo, install backstage:
+```
+npx @backstage/create-app@latest
+```
+This creates a blank backstage with the guest provider.
+We will add the [GitHub Auth Provider](https://backstage.io/docs/auth/github/provider/)
+Follow the instruction on creating a GitHub app.
+
 Install the GitHub plugin from the backstage folder:
 ```
 yarn --cwd packages/backend add @backstage/plugin-auth-backend-module-github-provider
+```
+
+Add the following files under a new path: catalog/entities (users.yaml and groups.yaml)
+```
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: RushkaVenter # your github username
+spec:
+  profile:
+    # Intentional no displayName for testing
+    email: rushka.venter@entelect.co.za
+    picture: https://api.dicebear.com/7.x/avataaars/svg?seed=Luna&backgroundColor=transparent
+  memberOf: [development]
+```
+```
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: development
+  description: Development Team
+spec:
+  type: team
+  profile:
+    # Intentional no displayName for testing
+    email: dev@example.com
+    picture: https://api.dicebear.com/7.x/identicon/svg?seed=Fluffy&backgroundType=solid,gradientLinear&backgroundColor=ffd5dc,b6e3f4
+  children: []
+```
+
+In the app-config.local.yaml file, add the auth configuration:
+```
+auth:
+  environment: development
+  providers:
+    github:
+      development:
+        clientId: ${AUTH_GITHUB_CLIENT_ID}
+        clientSecret: ${AUTH_GITHUB_CLIENT_SECRET}
+        ## uncomment if using GitHub Enterprise
+        # enterpriseInstanceUrl: ${AUTH_GITHUB_ENTERPRISE_INSTANCE_URL}
+        ## uncomment to set lifespan of user session
+        # sessionDuration: { hours: 24 } # supports `ms` library format (e.g. '24h', '2 days'), ISO duration, "human duration" as used in code
+        signIn:
+          resolvers:
+            # See https://backstage.io/docs/auth/github/provider#resolvers for more resolvers
+            - resolver: usernameMatchingUserEntityName
+catalog:
+  rules:
+    - allow: [Component, System, API, Resource, Location]
+  locations:
+    # Local example data, file locations are relative to the backend process, typically `packages/backend`
+    - type: file
+      target: ../../catalog/entities/users.yaml
+      rules:
+        - allow: [User]
+
+    - type: file
+      target: ../../catalog/entities/groups.yaml
+      rules:
+        - allow: [Group]
+```
+
+Add a .env to the backstage folder and add the secrets.
+
+Modify the file in packages/backend/src/index.ts with the following line and remove the guest provider.
+```
+backend.add(import('@backstage/plugin-auth-backend-module-github-provider'));
+```
+
+For the front end, ensure these changes on the packages/app/src/App.tsx file
+```
+import { githubAuthApiRef } from '@backstage/core-plugin-api';
+import { SignInPage } from '@backstage/core-components';
+
+const app = createApp({
+  components: {
+    SignInPage: props => (
+      <SignInPage
+        {...props}
+        auto
+        provider={{
+          id: 'github-auth-provider',
+          title: 'GitHub',
+          message: 'Sign in using GitHub',
+          apiRef: githubAuthApiRef,
+        }}
+      />
+    ),
+  },
+  // ..
+});
 ```
 
 From the backstage folder, you can run backstage with:
