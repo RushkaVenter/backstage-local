@@ -208,7 +208,7 @@ docker build -t backstage_production .
 ```
 
 ## Run the docker image
-docker run -d --name backstage_production -e POSTGRES_HOST=psql -e POSTGRES_PORT=5432 -e POSTGRES_USER=backstage -e POSTGRES_PASSWORD=backstage -e AUTH_GITHUB_CLIENT_ID=Ov23lidL0O5JNlKOM7Rg -e AUTH_GITHUB_CLIENT_SECRET=0ddfd31d7572554e9cd6c16bd6723a0dec300d31 -p 3000:3000 -p 7007:7007 --network backstage backstage_production
+docker run -d --name backstage_production -e POSTGRES_HOST=psql -e POSTGRES_PORT=5432 -e POSTGRES_USER=backstage -e POSTGRES_PASSWORD=backstage -e AUTH_GITHUB_CLIENT_ID=id -e AUTH_GITHUB_CLIENT_SECRET=secret -p 3000:3000 -p 7007:7007 --network backstage backstage_production
 
 # Run backstage on Kubernetes
 ## Setup Local Kubernetes Cluster
