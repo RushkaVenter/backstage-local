@@ -3681,6 +3681,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@backstage/plugin-auth-backend-module-microsoft-provider@npm:^0.3.5":
+  version: 0.3.5
+  resolution: "@backstage/plugin-auth-backend-module-microsoft-provider@npm:0.3.5"
+  dependencies:
+    "@backstage/backend-plugin-api": "npm:^1.4.1"
+    "@backstage/plugin-auth-node": "npm:^0.6.5"
+    express: "npm:^4.18.2"
+    jose: "npm:^5.0.0"
+    passport-microsoft: "npm:^1.0.0"
+    zod: "npm:^3.22.4"
+  checksum: 10c0/817eefa6477acee0219e0cdba209dc80c1a851d8e934b6fc21cf0a01a4f03b4c7dc4dfe6b7b6f59f99068ad81a56b90a4e2da2dfab31f8b16478731219f8e0b4
+  languageName: node
+  linkType: hard
+
 "@backstage/plugin-auth-backend@npm:^0.25.2":
   version: 0.25.2
   resolution: "@backstage/plugin-auth-backend@npm:0.25.2"
@@ -3796,6 +3810,25 @@ __metadata:
     "@backstage/plugin-catalog-backend": "npm:^3.0.0"
     "@backstage/plugin-events-node": "npm:^0.4.13"
   checksum: 10c0/04e8a1bd7fcebff1a394c1a8671bbf1ac75b59b3a6ef51516424065938ef44fca4c738983a80e0bdafcc364e7c2cf052c3b19162b004afad2913a41d45ce1dc4
+  languageName: node
+  linkType: hard
+
+"@backstage/plugin-catalog-backend-module-msgraph@npm:^0.7.2":
+  version: 0.7.2
+  resolution: "@backstage/plugin-catalog-backend-module-msgraph@npm:0.7.2"
+  dependencies:
+    "@azure/identity": "npm:^4.0.0"
+    "@backstage/backend-plugin-api": "npm:^1.4.1"
+    "@backstage/catalog-model": "npm:^1.7.5"
+    "@backstage/config": "npm:^1.3.3"
+    "@backstage/plugin-catalog-common": "npm:^1.1.5"
+    "@backstage/plugin-catalog-node": "npm:^1.17.2"
+    "@microsoft/microsoft-graph-types": "npm:^2.6.0"
+    lodash: "npm:^4.17.21"
+    p-limit: "npm:^3.0.2"
+    qs: "npm:^6.9.4"
+    uuid: "npm:^11.0.0"
+  checksum: 10c0/d5462d2f9921f10310998e6f6d75a0bfe7ef7485f12e6ec8a61563902c8af99f32bc5735105a3408c8edf68e4db898f559e73d787efc2b56ff84516c21126df7
   languageName: node
   linkType: hard
 
@@ -7600,6 +7633,13 @@ __metadata:
   version: 2.0.1
   resolution: "@microsoft/fetch-event-source@npm:2.0.1"
   checksum: 10c0/38c69e9b9990e6cee715c7bbfa2752f943b42575acadb36facf19bb831f1520c469f854277439154258e0e1dc8650cc85038230d1f451e3f6b62e8faeaa1126c
+  languageName: node
+  linkType: hard
+
+"@microsoft/microsoft-graph-types@npm:^2.6.0":
+  version: 2.40.0
+  resolution: "@microsoft/microsoft-graph-types@npm:2.40.0"
+  checksum: 10c0/c6f69a0fe136579d735efafc1375e4540e01d34ea488d987a9b651f7206c40c76991fff56df31e8b2593f16846bd748d0ffcf249d1f2629bb0298e6214fe2fdc
   languageName: node
   linkType: hard
 
@@ -15962,9 +16002,11 @@ __metadata:
     "@backstage/plugin-auth-backend": "npm:^0.25.2"
     "@backstage/plugin-auth-backend-module-github-provider": "npm:^0.3.5"
     "@backstage/plugin-auth-backend-module-guest-provider": "npm:^0.2.10"
+    "@backstage/plugin-auth-backend-module-microsoft-provider": "npm:^0.3.5"
     "@backstage/plugin-auth-node": "npm:^0.6.5"
     "@backstage/plugin-catalog-backend": "npm:^3.0.0"
     "@backstage/plugin-catalog-backend-module-logs": "npm:^0.1.12"
+    "@backstage/plugin-catalog-backend-module-msgraph": "npm:^0.7.2"
     "@backstage/plugin-catalog-backend-module-scaffolder-entity-model": "npm:^0.2.10"
     "@backstage/plugin-kubernetes-backend": "npm:^0.19.8"
     "@backstage/plugin-permission-backend": "npm:^0.7.2"
@@ -19975,7 +20017,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express@npm:^4.14.0, express@npm:^4.17.1, express@npm:^4.21.2":
+"express@npm:^4.14.0, express@npm:^4.17.1, express@npm:^4.18.2, express@npm:^4.21.2":
   version: 4.21.2
   resolution: "express@npm:4.21.2"
   dependencies:
@@ -27306,7 +27348,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"passport-oauth2@npm:1.x.x, passport-oauth2@npm:^1.7.0":
+"passport-microsoft@npm:^1.0.0":
+  version: 1.1.0
+  resolution: "passport-microsoft@npm:1.1.0"
+  dependencies:
+    passport-oauth2: "npm:1.8.0"
+  checksum: 10c0/e3e04746a64996e90c0f94fdbc974b6459dfe174ad5132e3f4a7db720fe57d0e17cb36e50ae0856f6c6fc0d1a76389c42656edf89b943eee3c251824c2df3811
+  languageName: node
+  linkType: hard
+
+"passport-oauth2@npm:1.8.0, passport-oauth2@npm:1.x.x, passport-oauth2@npm:^1.7.0":
   version: 1.8.0
   resolution: "passport-oauth2@npm:1.8.0"
   dependencies:

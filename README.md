@@ -124,6 +124,76 @@ Currently this does not connect to a db
 # Run backstage on Docker
 [See: Getting started prerequisites section](https://backstage.io/docs/getting-started/)
 
+## Add Azure Authentication and Catalogue
+To install the plugins:
+```
+yarn workspace backend add @backstage/plugin-catalog-backend-module-msgraph
+yarn workspace backend add @backstage/plugin-auth-backend-module-microsoft-provider
+```
+
+Add the plugins to the backend:
+```
+backend.add(import('@backstage/plugin-catalog-backend-module-msgraph'));
+backend.add(import('@backstage/plugin-auth-backend-module-microsoft-provider'));
+```
+
+Add the auth provider in auth section in the app-config.production.yaml:
+```
+microsoft:
+  development:
+    clientId: ${AUTH_MICROSOFT_CLIENT_ID}
+    clientSecret: ${AUTH_MICROSOFT_CLIENT_SECRET}
+    tenantId: ${AUTH_MICROSOFT_TENANT_ID}
+    signIn:
+      resolvers: #resolvers must be enabled, or else throws errors that Microsoft SSO is not configured correctly "NotFoundError"
+          - resolver: emailMatchingUserEntityProfileEmail
+          - resolver: emailLocalPartMatchingUserEntityName
+          - resolver: emailMatchingUserEntityAnnotation
+          - resolver: userIdMatchingUserEntityAnnotation
+```
+
+Add catalog section for Azure in the app-config.production.yaml
+```
+catalog:
+  rules:
+    - allow: [Component, System, API, Resource, Location, User, Group]
+
+  providers:
+    microsoftGraphOrg: 
+      providerId:
+        target: https://graph.microsoft.com/v1.0
+        authority: https://login.microsoftonline.com
+        tenantId: ${AUTH_MICROSOFT_TENANT_ID}
+        clientId: ${AUTH_MICROSOFT_CLIENT_ID}
+        clientSecret: ${AUTH_MICROSOFT_CLIENT_SECRET}
+        schedule:
+          frequency: PT3M
+          timeout: PT15M
+```
+
+Add the following Application permissions to your application registration:
+* User.Read.All
+* Group.Read.All
+* Directory.Read.All
+
+Update the signin page section:
+```
+SignInPage: props => <SignInPage {...props} auto providers={[{
+          id: 'github-auth-provider',
+          title: 'GitHub',
+          message: 'Sign in using GitHub',
+          apiRef: githubAuthApiRef,
+        }} />,
+        },
+        {
+          id: 'microsoft-auth-provider',
+          title: 'Microsoft',
+          message: 'Sign in using Microsoft',
+          apiRef: microsoftAuthApiRef,
+        }]} />,
+  },
+```
+
 ## Setup network for Backstage
 ```
 docker network create backstage
@@ -208,7 +278,7 @@ docker build -t backstage_production .
 ```
 
 ## Run the docker image
-docker run -d --name backstage_production -e POSTGRES_HOST=psql -e POSTGRES_PORT=5432 -e POSTGRES_USER=backstage -e POSTGRES_PASSWORD=backstage -e AUTH_GITHUB_CLIENT_ID=id -e AUTH_GITHUB_CLIENT_SECRET=secret -p 3000:3000 -p 7007:7007 --network backstage backstage_production
+docker run -d --name backstage_production -e POSTGRES_HOST=psql -e POSTGRES_PORT=5432 -e POSTGRES_USER=backstage -e POSTGRES_PASSWORD=backstage -e AUTH_GITHUB_CLIENT_ID=githubclientid -e AUTH_GITHUB_CLIENT_SECRET=githubclientsecret -e AUTH_MICROSOFT_CLIENT_ID=AppRegId -e AUTH_MICROSOFT_CLIENT_SECRET=AppRegSecret -e AUTH_MICROSOFT_TENANT_ID=AppRegTenant -p 3000:3000 -p 7007:7007 --network backstage backstage_production
 
 # Run backstage on Kubernetes
 ## Setup Local Kubernetes Cluster
