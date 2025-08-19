@@ -31,7 +31,7 @@ spec:
           - name: POSTGRES_PASSWORD
             value: backstage
           - name: GITHUB_TOKEN
-            value: some_secret_value(DO NOT PUSH SECRETS TO GITHUB)
+            value: some_secret_value(DO NOT PUSH SECRETS TO GITHUB)A
           - name: AUTH_GITHUB_CLIENT_ID
             value: some_secret_value(DO NOT PUSH SECRETS TO GITHUB)
           - name: AUTH_GITHUB_CLIENT_SECRET
@@ -41,7 +41,7 @@ spec:
           - name: AUTH_MICROSOFT_CLIENT_SECRET
             value: some_secret_value(DO NOT PUSH SECRETS TO GITHUB)
           - name: AUTH_MICROSOFT_TENANT_ID
-            value: some_secret_value(DO NOT PUSH SECRETS TO GITHUB) 
+            value: some_secret_value(DO NOT PUSH SECRETS TO GITHUB)
 
 ---
 apiVersion: v1
