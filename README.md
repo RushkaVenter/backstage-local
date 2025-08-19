@@ -470,3 +470,10 @@ NOTE: if you are experiencing issues connecting to the port when something else 
 ```
 kubectl port-forward svc/psql-postgresql 15432:5432 -n backstage
 ```
+
+To remove your k8s deployment, you can run the following:
+```
+kubectl delete -f .\backstage-k8s.yaml -n backstage
+helm uninstall psql -n backstage
+kubectl delete namespace backstage
+```
