@@ -314,3 +314,159 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main
 ```
 kind delete cluster --name kind
 ```
+
+## Postgres DB on kubernetes
+Create the a helm values file:
+```
+global:
+  postgresql:
+    auth:
+      postgresPassword: "backstage"
+      username: "backstage"
+      password: "backstage"
+      database: "backstage"
+primary:
+  name: primary
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+  persistence:
+    enabled: true
+    size: 8Gi
+```
+
+Install the chart repo:
+```
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+```
+
+Install the chart
+```
+helm install psql bitnami/postgresql --version 16.7.26 -n backstage --create-namespace -f values-postgres.yaml
+```
+
+You can check that this worked to deploy the backstage image by:
+```
+kubectl exec -ti psql-postgresql-0 -n backstage -- sh
+psql -U backstage
+```
+
+You should see "backstage=>" on success
+
+## Backstage on Kubernetes
+Build a new docker image with the following commands and push the image to Docker Hub
+```
+docker build -t backstage:v1 .
+docker tag backstage:v1 <account name>/backstage:v1
+docker login
+docker push <account name>/backstage:v1
+```
+
+Create the helm chart for backstage and apply it to kubernetes
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backstage
+  labels:
+    app: backstage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backstage
+  template:
+    metadata:
+      labels:
+        app: backstage
+    spec:
+      containers:
+      - name: backstage
+        image: rushkaventervector/backstage:v1
+        ports:
+        - containerPort: 7007
+        env:
+          - name: APP_CONFIG_app_baseUrl
+            value: https://backstage.test.com
+          - name: APP_CONFIG_backend_baseUrl
+            value: https://backstage.test.com
+          - name: POSTGRES_HOST
+            value: psql-postgresql
+          - name: POSTGRES_USER
+            value: backstage
+          - name: POSTGRES_PASSWORD
+            value: backstage
+          - name: GITHUB_TOKEN
+            value: some_secret_value(DO NOT PUSH SECRETS TO GITHUB)
+          - name: AUTH_GITHUB_CLIENT_ID
+            value: some_secret_value(DO NOT PUSH SECRETS TO GITHUB)
+          - name: AUTH_GITHUB_CLIENT_SECRET
+            value: some_secret_value(DO NOT PUSH SECRETS TO GITHUB)
+          - name: AUTH_MICROSOFT_CLIENT_ID
+            value: some_secret_value(DO NOT PUSH SECRETS TO GITHUB)
+          - name: AUTH_MICROSOFT_CLIENT_SECRET
+            value: some_secret_value(DO NOT PUSH SECRETS TO GITHUB)
+          - name: AUTH_MICROSOFT_TENANT_ID
+            value: some_secret_value(DO NOT PUSH SECRETS TO GITHUB) 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backstage
+spec:
+  selector:
+    app: backstage
+  ports:
+    - protocol: TCP
+      port: 7007
+      targetPort: 7007
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backstage
+spec:
+  rules:
+  - host: "backstage.test.com"
+    http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: backstage
+              port:
+                number: 7007
+```
+
+```
+kubectl apply -f backstage-k8s.yaml -n backstage
+```
+
+You would need to add the following to your hosts file:
+```
+127.0.0.1 backstage.test.com
+```
+
+You will need to add the following redirect url to your Azure App Registration:
+https://backstage.test.com/api/auth/microsoft/handler/frame
+
+You will need to update your GitHub Application's Home URL to 
+https://backstage.test.com
+Change the backend url to:
+https://backstage.test.com/api/auth/github/handler/frame
+
+You should be able to access the backstage through https://backstage.test.com/
+You can connect to the DB by using pgadmin with the following details:
+Host: psql-postgresql
+Port: 5432
+Username: backstage
+Password: backstage
+
+NOTE: if you are experiencing issues connecting to the port when something else on your system is using it, you can forward a different port to the pod:
+```
+kubectl port-forward svc/psql-postgresql 15432:5432 -n backstage
+```

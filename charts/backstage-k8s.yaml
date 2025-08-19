@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backstage
+  labels:
+    app: backstage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backstage
+  template:
+    metadata:
+      labels:
+        app: backstage
+    spec:
+      containers:
+      - name: backstage
+        image: rushkaventervector/backstage:v1
+        ports:
+        - containerPort: 7007
+        env:
+          - name: APP_CONFIG_app_baseUrl
+            value: https://backstage.test.com
+          - name: APP_CONFIG_backend_baseUrl
+            value: https://backstage.test.com
+          - name: POSTGRES_HOST
+            value: psql-postgresql
+          - name: POSTGRES_USER
+            value: backstage
+          - name: POSTGRES_PASSWORD
+            value: backstage
+          - name: GITHUB_TOKEN
+            value: some_secret_value(DO NOT PUSH SECRETS TO GITHUB)
+          - name: AUTH_GITHUB_CLIENT_ID
+            value: some_secret_value(DO NOT PUSH SECRETS TO GITHUB)
+          - name: AUTH_GITHUB_CLIENT_SECRET
+            value: some_secret_value(DO NOT PUSH SECRETS TO GITHUB)
+          - name: AUTH_MICROSOFT_CLIENT_ID
+            value: some_secret_value(DO NOT PUSH SECRETS TO GITHUB)
+          - name: AUTH_MICROSOFT_CLIENT_SECRET
+            value: some_secret_value(DO NOT PUSH SECRETS TO GITHUB)
+          - name: AUTH_MICROSOFT_TENANT_ID
+            value: some_secret_value(DO NOT PUSH SECRETS TO GITHUB) 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backstage
+spec:
+  selector:
+    app: backstage
+  ports:
+    - protocol: TCP
+      port: 7007
+      targetPort: 7007
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backstage
+spec:
+  rules:
+  - host: "backstage.test.com"
+    http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: backstage
+              port:
+                number: 7007

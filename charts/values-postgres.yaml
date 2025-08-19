@@ -1,0 +1,16 @@
+global:
+  postgresql:
+    auth:
+      postgresPassword: "backstage"
+      username: "backstage"
+      password: "backstage"
+      database: "backstage"
+primary:
+  name: primary
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+  persistence:
+    enabled: true
+    size: 8Gi
